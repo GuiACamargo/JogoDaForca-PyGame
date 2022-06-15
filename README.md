@@ -5,5 +5,5 @@ com a biblioteca do *PyGame-widgets*.
 
 > Para instalar inicialize o instalador .msi!
 
-####🚧Atenção!🚧
+###🚧Atenção!🚧
 Botão de reiniciar com algumas instabilidades.
