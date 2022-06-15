@@ -4,3 +4,4 @@ O objetivo desse projeto foi aprimorar meus conhecimentos lógicos em **Python e
 com a biblioteca do *PyGame-widgets*.
 
 > Para instalar inicialize o instalador .msi!
+> 🚧**Atenção!**🚧: Botão de reiniciar com algumas instabilidades.
