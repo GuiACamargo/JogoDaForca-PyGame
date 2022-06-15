@@ -1,8 +1,8 @@
 #Feito por Guilherme Albani Camargo
 
 import pygame
-
 import pygame_widgets
+import funcoes
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
 
@@ -36,39 +36,48 @@ pygameDisplay.set_icon(gameIcon)
 alfabetoCompleto = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]
 
 def outputDesafiante():
-    if textboxDesafiante.getText() != "":
-        textboxDesafiante.hide()
-        textboxTitleAcimaDesafiante.hide()
-        textboxRegistraPalavraChave.show()
-        textboxRegistraDica1.show()
-        textboxRegistraDica2.show()
-        textboxRegistraDica3.show()
-        textboxTitleAcimaPalavraChave.show()
-        textboxTitleAcimaDica1.show()
-        textboxTitleAcimaDica2.show()
-        textboxTitleAcimaDica3.show()
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxDesafiante.getText() != "":
+            textboxDesafiante.hide()
+            textboxTitleAcimaDesafiante.hide()
+            textboxRegistraPalavraChave.show()
+            textboxRegistraDica1.show()
+            textboxRegistraDica2.show()
+            textboxRegistraDica3.show()
+            textboxTitleAcimaPalavraChave.show()
+            textboxTitleAcimaDica1.show()
+            textboxTitleAcimaDica2.show()
+            textboxTitleAcimaDica3.show()
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
 
 def outputCompetidor():
-    if textboxCompetidor.getText() != "":
-        textboxCompetidor.hide()
-        textboxTitleAcimaCompetidor.hide()
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxCompetidor.getText() != "":
+            textboxCompetidor.hide()
+            textboxTitleAcimaCompetidor.hide()
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
 
 def outputPalavraChave():
-    if textboxRegistraPalavraChave.getText() != "":
-        textboxRegistraPalavraChave.hide()
-        textboxTitleAcimaPalavraChave.hide()
-        palavraChave = textboxRegistraPalavraChave.getText().upper()
-        asteriscos = list("_" * len(palavraChave))
-        textboxAdivinharAPalavra.setText(" ".join(asteriscos))
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxRegistraPalavraChave.getText() != "":
+            textboxRegistraPalavraChave.hide()
+            textboxTitleAcimaPalavraChave.hide()
+            palavraChave = textboxRegistraPalavraChave.getText().upper()
+            asteriscos = list("_" * len(palavraChave))
+            textboxAdivinharAPalavra.setText(" ".join(asteriscos))
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
         
 
 errado = []
@@ -79,29 +88,17 @@ def outputChute(text):
     ###Confere se tudo foi registrado  
     if textboxRegistraPalavraChave.getText() != "" and textboxRegistraDica1.getText() != "" and textboxRegistraDica2.getText() != "" and textboxRegistraDica3.getText() != "" and textboxCompetidor.getText() != "":
         ###Se ouver menos que cinco erros e ainda falta letras para completar a palavra
-        if len(errado) < 5 and certo != list(dict.fromkeys(list(textboxRegistraPalavraChave.getText().upper()))):
+        if len(errado) < 5 and certo != funcoes.palavraChaveEmListaSemRepetirParaComparar(textboxRegistraPalavraChave):
             textboxLog.setText("")
             ###Coloca a palavra chave em letra maiúscula e separa as letras em listas
             palavraChave = textboxRegistraPalavraChave.getText().upper()
             palavraChave = list(textboxRegistraPalavraChave.getText().upper())
-            jaEstaEmErrado = False
-            ###Confere se a letra enviada ja está na lista de letras erradas, ou na lista das letras da palavra chave e passa para o proximo sprite do meteoro   
-            if text in errado:
-                jaEstaEmErrado = True
-            if text in palavraChave:
-                certo.append(text)
-            elif (jaEstaEmErrado == False):
-                arrayContadorMeteoro.append(1)
-                errado.append(text)     
+               
+            funcoes.separaEntreCertoEErradoEMudaSpriteDoMeteoro(text, errado, certo, palavraChave, arrayContadorMeteoro)    
             
-            ###Lógica para o requerimento de dicas
             textboxLetrasErradas.setText(", ".join(errado))
-            if tickets.count(1) == 1:
-                tickets.remove(1)
-            if tickets.count(2) == 1 and tickets.count(1) == 0:
-                tickets.remove(2)
-            if tickets.count(3) == 1 and tickets.count(2) == 0:
-                tickets.remove(3)
+    
+            funcoes.permiteMostrarDicas(tickets)
             
             #Monta a palavra utilizando o "_" para mostrar quantas letras tem
             textboxAdivinharAPalavra.setText("")
@@ -112,19 +109,19 @@ def outputChute(text):
                     textboxAdivinharAPalavra.setText(textboxAdivinharAPalavra.getText() + "_ ")
 
         ###Se a lista de letras certas for igual a lista das letras da palavra certa, o competidor ganha            
-        elif all(item in certo for item in list(dict.fromkeys(list(textboxRegistraPalavraChave.getText().upper())))):
+        elif all(item in certo for item in funcoes.palavraChaveEmListaSemRepetirParaComparar(textboxRegistraPalavraChave)):
             textboxGanhador.setText("VENCEDOR: " + textboxCompetidor.getText())
             textboxGanhador.show()
             textboxHistorico.show()
             textboxTitleAcimaHistorico.show()
-            arquivo = open("registros/banco.txt", "a")
-            arquivo.write("Palavra: " + textboxRegistraPalavraChave.getText() + " - Vencedor: Competidor " + textboxCompetidor.getText() + ", Perdedor: Desafiante " + textboxDesafiante.getText() + "\n")
-            arquivo.close()
+
+            funcoes.salvaCompetidorVitoria(textboxRegistraPalavraChave.getText(), textboxCompetidor.getText(), textboxDesafiante.getText())
             arquivoR = open("registros/banco.txt", "r")
             linhasArquivo = arquivoR.readlines()
             ultimaLinha = linhasArquivo[len(linhasArquivo) - 2]
             textboxHistorico.setText(ultimaLinha)
             arquivoR.close()
+
 
         ###Se a lista de letras certas não for igual a lista das letras da palavra certa, o desafiante ganha
         else:
@@ -133,41 +130,51 @@ def outputChute(text):
             textboxGanhador.show()
             textboxHistorico.show()
             textboxTitleAcimaHistorico.show()
-            arquivo = open("registros/banco.txt", "a")
-            arquivo.write("Palavra: " + textboxRegistraPalavraChave.getText() + " - Vencedor: Desafiante " + textboxDesafiante.getText() + ", Perdedor: Competidor " + textboxCompetidor.getText() + "\n")
-            arquivo.close()
+            
+            funcoes.salvaDesafianteVitoria(textboxRegistraPalavraChave.getText(), textboxCompetidor.getText(), textboxDesafiante.getText())
+
             arquivoR = open("registros/banco.txt", "r")
             linhasArquivo = arquivoR.readlines()
             ultimaLinha = linhasArquivo[len(linhasArquivo) - 2]
             textboxHistorico.setText(ultimaLinha)
             arquivoR.close()
+    
     ###Avisa no Log de Erros do usuário se faltou preencher algum campo    
     else:
         textboxLog.setText("Preencha todos os campos! (Não deixe vazio!)")
 
 def outputDica1():
-    if textboxRegistraDica1.getText() != "":
-        textboxRegistraDica1.hide()
-        textboxTitleAcimaDica1.hide()
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxRegistraDica1.getText() != "":
+            textboxRegistraDica1.hide()
+            textboxTitleAcimaDica1.hide()
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
 
 def outputDica2():
-    if textboxRegistraDica2.getText() != "":
-        textboxRegistraDica2.hide()
-        textboxTitleAcimaDica2.hide()
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxRegistraDica2.getText() != "":
+            textboxRegistraDica2.hide()
+            textboxTitleAcimaDica2.hide()
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
 
 def outputDica3():
-    if textboxRegistraDica3.getText() != "":
-        textboxRegistraDica3.hide()
-        textboxTitleAcimaDica3.hide()
-        textboxLog.setText("")
-    else:
-        textboxLog.setText("Não deixe os campos em branco/vazio!")
+    try:
+        if textboxRegistraDica3.getText() != "":
+            textboxRegistraDica3.hide()
+            textboxTitleAcimaDica3.hide()
+            textboxLog.setText("")
+        else:
+            textboxLog.setText("Não deixe os campos em branco/vazio!")
+    except:
+        textboxLog.setText("Erro ao registrar campo!")
 
 naoPodeJogarNovamenteDica1 = []
 naoPodeJogarNovamenteDica2 = []
@@ -175,48 +182,57 @@ naoPodeJogarNovamenteDica3 = []
 ##---------Dicas---------
 ###Uso de array como método de True ou False (count)
 def outputBotaoDica1(textboxRegistraDica, textboxApresentaDicas, log):
-    if textboxRegistraDica.getText() != "" and tickets.count(1) == 0 and naoPodeJogarNovamenteDica1.count(5) == 0:
-        textboxApresentaDicas.setText("Dica 1: " + textboxRegistraDica.getText().upper())
-        log.setText("")
-        if naoPodeJogarNovamenteDica1.count(5) == 0:
-            naoPodeJogarNovamenteDica1.append(5)
-        if tickets.count(2) == 0:
-            tickets.append(2)
-    elif textboxRegistraDica.getText() == "":
-        log.setText("Dica 1 não registrada!")
-    elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica2.count(5) == 0:
-        log.setText("Dica 1 já pedida, jogue 1 vez para pedir Dica 2!")
-    elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica2.count(5) != 0:
-        log.setText("Dica 1 já pedida!")
-    else:
-        log.setText("Jogue uma vez para pedir Dica 1!")
+    try:
+        if textboxRegistraDica.getText() != "" and tickets.count(1) == 0 and naoPodeJogarNovamenteDica1.count(5) == 0:
+            textboxApresentaDicas.setText("Dica 1: " + textboxRegistraDica.getText().upper())
+            log.setText("")
+            if naoPodeJogarNovamenteDica1.count(5) == 0:
+                naoPodeJogarNovamenteDica1.append(5)
+            if tickets.count(2) == 0:
+                tickets.append(2)
+        elif textboxRegistraDica.getText() == "":
+            log.setText("Dica 1 não registrada!")
+        elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica2.count(5) == 0:
+            log.setText("Dica 1 já pedida, jogue 1 vez para pedir Dica 2!")
+        elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica2.count(5) != 0:
+            log.setText("Dica 1 já pedida!")
+        else:
+            log.setText("Jogue uma vez para pedir Dica 1!")
+    except:
+        log.setText("Erro ao pedir Dica 1!")
 
 def outputBotaoDica2(textboxRegistraDica, textboxApresentaDicas, log):
-    if textboxRegistraDica.getText() != "" and tickets.count(2) == 0 and tickets.count(1) == 0 and naoPodeJogarNovamenteDica2.count(5) == 0:
-        textboxApresentaDicas.setText("Dica 2: " + textboxRegistraDica.getText().upper())
-        log.setText("")
-        if naoPodeJogarNovamenteDica2.count(5) == 0:
-            naoPodeJogarNovamenteDica2.append(5)
-        if tickets.count(3) == 0:
-            tickets.append(3)
-    elif textboxRegistraDica.getText() == "":
-        log.setText("Dica 2 não registrada!")
-    elif naoPodeJogarNovamenteDica2.count(5) != 0 and naoPodeJogarNovamenteDica3.count(5) == 0:
-        log.setText("Dica 2 já pedida, jogue 1 vez para pedir Dica 3!")
-    elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica3.count(5) != 0:
-        log.setText("Dica 2 já pedida!")
+    try:
+        if textboxRegistraDica.getText() != "" and tickets.count(2) == 0 and tickets.count(1) == 0 and naoPodeJogarNovamenteDica2.count(5) == 0:
+            textboxApresentaDicas.setText("Dica 2: " + textboxRegistraDica.getText().upper())
+            log.setText("")
+            if naoPodeJogarNovamenteDica2.count(5) == 0:
+                naoPodeJogarNovamenteDica2.append(5)
+            if tickets.count(3) == 0:
+                tickets.append(3)
+        elif textboxRegistraDica.getText() == "":
+            log.setText("Dica 2 não registrada!")
+        elif naoPodeJogarNovamenteDica2.count(5) != 0 and naoPodeJogarNovamenteDica3.count(5) == 0:
+            log.setText("Dica 2 já pedida, jogue 1 vez para pedir Dica 3!")
+        elif naoPodeJogarNovamenteDica1.count(5) != 0 and naoPodeJogarNovamenteDica3.count(5) != 0:
+            log.setText("Dica 2 já pedida!")
+    except:
+        log.setText("Erro ao pedir Dica 1!")
 
 
 def outputBotaoDica3(textboxRegistraDica, textboxApresentaDicas, log):
-    if textboxRegistraDica.getText() != "" and tickets.count(3) == 0 and tickets.count(2) == 0 and tickets.count(1) == 0 and naoPodeJogarNovamenteDica3.count(5) == 0:
-        textboxApresentaDicas.setText("Dica 3: " + textboxRegistraDica.getText().upper())
-        log.setText("")
-        if naoPodeJogarNovamenteDica3.count(5) == 0:
-            naoPodeJogarNovamenteDica3.append(5)
-    elif textboxRegistraDica.getText() == "":
-        log.setText("Dica 3 não registrada!")
-    elif naoPodeJogarNovamenteDica3.count(5) != 0:
-        log.setText("Dica 3 já pedida!")
+    try:
+        if textboxRegistraDica.getText() != "" and tickets.count(3) == 0 and tickets.count(2) == 0 and tickets.count(1) == 0 and naoPodeJogarNovamenteDica3.count(5) == 0:
+            textboxApresentaDicas.setText("Dica 3: " + textboxRegistraDica.getText().upper())
+            log.setText("")
+            if naoPodeJogarNovamenteDica3.count(5) == 0:
+                naoPodeJogarNovamenteDica3.append(5)
+        elif textboxRegistraDica.getText() == "":
+            log.setText("Dica 3 não registrada!")
+        elif naoPodeJogarNovamenteDica3.count(5) != 0:
+            log.setText("Dica 3 já pedida!")
+    except:
+        log.setText("Erro ao pedir Dica 1!")
 ##<<---------Dicas--------->>
 
 def outputBotaoSair():
@@ -365,12 +381,6 @@ def criarBotao(x, y, texto):
     textColour = rosa15,
     onClick = lambda: outputChute(texto)
     )
-
-def listagemBotoes(alfabeto, posicaoY):
-    posicaoBotaoX = 800
-    for letras in alfabeto:
-        criarBotao(posicaoBotaoX, posicaoY, letras)
-        posicaoBotaoX = posicaoBotaoX + 100
 #<<---------Widgets Functions--------->>
 
 #---------Botões---------
@@ -379,10 +389,10 @@ alfabeto2 = ["G", "H", "I", "J", "K", "L"]
 alfabeto3 = ["M", "N", "O", "P", "Q", "R"]
 alfabeto4 = ["S", "T", "U", "V", "W", "X"]
 
-listagemBotoes(alfabeto1, 345)
-listagemBotoes(alfabeto2, 415)
-listagemBotoes(alfabeto3, 485)
-listagemBotoes(alfabeto4, 555)
+funcoes.listagemBotoes(alfabeto1, 345, criarBotao)
+funcoes.listagemBotoes(alfabeto2, 415, criarBotao)
+funcoes.listagemBotoes(alfabeto3, 485, criarBotao)
+funcoes.listagemBotoes(alfabeto4, 555, criarBotao)
 criarBotao(1000, 625, "Y")
 criarBotao(1100, 625, "Z")
 
@@ -564,6 +574,9 @@ def jogo():
     textboxTitleAcimaDica1.hide()
     textboxTitleAcimaDica2.hide()
     textboxTitleAcimaDica3.hide()
+    textboxGanhador.hide()
+    textboxTitleAcimaHistorico.hide()
+    textboxHistorico.hide()
     textboxDesafiante.show()
     textboxCompetidor.show()
     textboxTitleAcimaCompetidor.show()
@@ -573,6 +586,7 @@ def jogo():
     textboxRegistraDica3.setText("")
     textboxLog.setText("")
     textboxRegistraPalavraChave.setText("")
+    textboxAdivinharAPalavra.setText("")
     textboxHistorico.setText("")
     textboxCompetidor.setText("")
     textboxDesafiante.setText("")
@@ -586,18 +600,14 @@ def jogo():
     errado.clear()
     certo.clear()
     tickets.clear()
-    tickets.append(1)
     arrayContadorMeteoro.clear()
     errado.clear()
     certo.clear()
     naoPodeJogarNovamenteDica1.clear()
     naoPodeJogarNovamenteDica2.clear()
     naoPodeJogarNovamenteDica3.clear()
-    textboxAdivinharAPalavra.setText("")
-    textboxGanhador.hide()
-    textboxTitleAcimaHistorico.hide()
-    textboxHistorico.hide()
-
+    tickets.append(1)
+    
 run = True
 while run:
     statusMeteoro = len(arrayContadorMeteoro)
